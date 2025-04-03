@@ -1,16 +1,19 @@
-library(microbenchmark)
+#include bit64
 
 lcg <- function(seed, a=1664525, c=1013904223, m=2^32) {
-  value <- as.numeric(seed)
+  value <- as.integer64(seed)
+  a <- as.integer64(a)
+  c <- as.integer64(c)
+  m <- as.integer64(m)
   function() {
     value <<- (a * value + c) %% m
-    value
+    as.numeric(value)
   }
 }
 
 max_subarray_sum <- function(n, seed, min_val, max_val) {
   lcg_gen <- lcg(seed)
-  random_numbers <- (vapply(1:n, function(x) lcg_gen(), numeric(1)) %% (max_val - min_val + 1)) + min_val
+  random_numbers <- sapply(1:n, function(x) (lcg_gen() %% (max_val - min_val + 1)) + min_val)
   
   max_sum <- -Inf
   current_sum <- 0
@@ -23,18 +26,19 @@ max_subarray_sum <- function(n, seed, min_val, max_val) {
 
 total_max_subarray_sum <- function(n, initial_seed, min_val, max_val) {
   lcg_gen <- lcg(initial_seed)
-  seeds <- vapply(1:20, function(x) lcg_gen(), numeric(1))
-  sum(vapply(seeds, function(seed) max_subarray_sum(n, seed, min_val, max_val), numeric(1)))
+  sum(sapply(1:20, function(x) max_subarray_sum(n, lcg_gen(), min_val, max_val)))
 }
 
 # Parameters
-n <- 10000        # Number of random numbers
-initial_seed <- 42 # Initial seed for the LCG
-min_val <- -10    # Minimum value of random numbers
-max_val <- 10     # Maximum value of random numbers
+n <- 10000
+initial_seed <- 42
+min_val <- -10
+max_val <- 10
 
 # Timing the function
-result <- microbenchmark(total_max_subarray_sum(n, initial_seed, min_val, max_val), times = 1)
+start_time <- Sys.time()
+result <- total_max_subarray_sum(n, initial_seed, min_val, max_val)
+end_time <- Sys.time()
 
-cat("Total Maximum Subarray Sum (20 runs):", result$time / 1e9, "\n")
-cat("Execution Time:", result$time / 1e9, "seconds\n")
+cat("Total Maximum Subarray Sum (20 runs):", result, "\n")
+cat("Execution Time:", format(end_time - start_time, digits=6), "seconds\n")
