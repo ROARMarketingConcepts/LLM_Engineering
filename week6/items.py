@@ -2,7 +2,7 @@ from typing import Optional
 from transformers import AutoTokenizer
 import re
 
-BASE_MODEL = "meta-llama/Meta-Llama-3.1-8B"
+BASE_MODEL = "meta-llama/Meta-Llama-3.1-8B"  # we will be using the Llama tokenizer
 
 MIN_TOKENS = 150 # Any less than this, and we don't have enough useful content
 MAX_TOKENS = 160 # Truncate after this many tokens. Then after adding in prompt text, we will get to around 180 tokens
@@ -25,7 +25,7 @@ class Item:
     category: str
     token_count: int = 0
     details: Optional[str]
-    prompt: Optional[str] = None
+    prompt: Optional[str] = None   # prompt to send to the LLM
     include = False
 
     def __init__(self, data, price):
@@ -38,7 +38,7 @@ class Item:
         Clean up the details string by removing common text that doesn't add value
         """
         details = self.details
-        for remove in self.REMOVALS:
+        for remove in self.REMOVALS:     # REMOVALS list of phrases is above
             details = details.replace(remove, "")
         return details
 
@@ -50,6 +50,7 @@ class Item:
         stuff = re.sub(r'[:\[\]"{}【】\s]+', ' ', stuff).strip()
         stuff = stuff.replace(" ,", ",").replace(",,,",",").replace(",,",",")
         words = stuff.split(' ')
+        # the following line eliminates using up tokens with manufacturer part numbers
         select = [word for word in words if len(word)<7 or not any(char.isdigit() for char in word)]
         return " ".join(select)
     
