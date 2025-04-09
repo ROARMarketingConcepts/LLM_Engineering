@@ -67,7 +67,7 @@ class Item:
             contents += features + '\n'
         self.details = data['details']
         if self.details:
-            contents += self.scrub_details() + '\n'
+            contents += self.scrub_details() + '\n'   # get rid of anything contained in REMOVALS list
         if len(contents) > MIN_CHARS:
             contents = contents[:CEILING_CHARS]
             text = f"{self.scrub(self.title)}\n{self.scrub(contents)}"
