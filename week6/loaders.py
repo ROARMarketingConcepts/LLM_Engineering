@@ -5,8 +5,8 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from items import Item
 
 CHUNK_SIZE = 1000
-MIN_PRICE = 0.5
-MAX_PRICE = 999.49
+MIN_PRICE = 0.5       # Minimum price of an item to eliminate outliers
+MAX_PRICE = 999.49    # Maximum price of an item to eliminate outliers
 
 class ItemLoader:
 
